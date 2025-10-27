@@ -1,7 +1,7 @@
-# expectimax_agent.py
 from agent_base import Agent
 from game import GameState
 from evaluation import betterEvaluationFunction
+
 
 class ExpectimaxAgent(Agent):
     def get_action(self, state: GameState, depth=None):
@@ -18,22 +18,6 @@ class ExpectimaxAgent(Agent):
         return action
 
     def expectimax(self, state: GameState, depth_limit, current_depth):
-        """
-        Recursive Expectimax returning (value, best_action)
-        
-        TODO: Implement the expectimax algorithm here.
-        
-        The algorithm should:
-        1. Check if the state is terminal and return (utility, None) if so
-        2. Check if depth limit is reached and use heuristic evaluation if so
-        3. For MAX node ('X'): find the action that maximizes expected value
-        4. For CHANCE node ('O'): calculate expected value by averaging over all possible actions
-           (assumes opponent plays randomly with uniform probability)
-        5. Return the value and best action as a tuple
-        
-        Hint: For chance nodes, you'll need to average the values of all successor states.
-              Use betterEvaluationFunction(state) for non-terminal cutoff evaluation.
-        """
         # Terminal check
         if state.is_terminal():
             return state.utility(), None
@@ -42,6 +26,32 @@ class ExpectimaxAgent(Agent):
         if depth_limit is not None and current_depth >= depth_limit:
             return betterEvaluationFunction(state), None
 
-        # TODO: Implement the expectimax algorithm logic here
-        # Remove this line and implement the algorithm
-        raise NotImplementedError("Expectimax algorithm not implemented yet")
+        if state.to_move == 'X':
+            best_val = float('-inf')
+            best_act = None
+
+            for a in state.get_legal_actions():
+                s2 = state.generate_successor(a)
+                v, _ = self.expectimax(s2, depth_limit, current_depth + 1)
+
+                if v > best_val:
+                    best_val = v
+                    best_act = a
+
+            return best_val, best_act
+
+        else:
+            actions = state.get_legal_actions()
+            if not actions:
+
+                return betterEvaluationFunction(state), None
+
+            total = 0.0
+            for a in actions:
+                s2 = state.generate_successor(a)
+                v, _ = self.expectimax(s2, depth_limit, current_depth + 1)
+                total += v
+
+            expected_value = total / len(actions)
+            # No single "best action" at chance nodes (environment/opponent chooses randomly)
+            return expected_value, None
