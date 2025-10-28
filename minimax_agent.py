@@ -7,7 +7,7 @@ class MinimaxAgent:
         _, action = self.minimax(state)
         return action
 
-    def minimax(self, state):
+    def minimax(self, state,depth_limit=None):
         # Base case: check for terminal state
         if state.is_terminal():
             return state.utility(), None
