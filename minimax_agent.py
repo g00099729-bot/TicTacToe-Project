@@ -2,41 +2,31 @@
 from agent_base import Agent
 from game import GameState
 
-class MinimaxAgent(Agent):
-    def get_action(self, state: GameState, depth=None):
+class MinimaxAgent:
+    def get_action(self, state, depth_limit=None):
         _, action = self.minimax(state)
         return action
 
-    def minimax(self, state, depth_limit=None):
-       
+    def minimax(self, state):
+        # Base case: check for terminal state
         if state.is_terminal():
             return state.utility(), None
 
-        player = state.to_move
-        legal_actions = state.get_legal_actions()
-
-        if player == 'X':
-            best_value = float('-inf')
+        if state.current_player == 'X':  # Maximizing player
+            best_val = float('-inf')
             best_action = None
-
-            for action in legal_actions:
-                successor = state.generate_successor(action)
-                value, _ = self.minimax(successor, depth_limit)
-                if value > best_value:
-                    best_value = value
+            for action in state.get_legal_actions():
+                val, _ = self.minimax(state.result(action))
+                if val > best_val:
+                    best_val = val
                     best_action = action
-
-            return best_value, best_action
-
-        else:
-            best_value = float('inf')
+            return best_val, best_action
+        else:  # Minimizing player
+            best_val = float('inf')
             best_action = None
-
-            for action in legal_actions:
-                successor = state.generate_successor(action)
-                value, _ = self.minimax(successor, depth_limit)
-                if value < best_value:
-                    best_value = value
+            for action in state.get_legal_actions():
+                val, _ = self.minimax(state.result(action))
+                if val < best_val:
+                    best_val = val
                     best_action = action
-
-            return best_value, best_action
+            return best_val, best_action
