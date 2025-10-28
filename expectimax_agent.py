@@ -55,3 +55,5 @@ class ExpectimaxAgent(Agent):
             expected_value = total / len(actions)
             # No single "best action" at chance nodes (environment/opponent chooses randomly)
             return expected_value, None
+            _, action = self.minimax(state)
+            return action
