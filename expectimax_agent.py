@@ -10,11 +10,13 @@ class ExpectimaxAgent(Agent):
         Handles stochastic (non-optimal) opponent moves.
         """
         value, action = self.expectimax(state, depth_limit=depth, current_depth=0)
+
         # Safety fallback in case no action is found
         if action is None:
             legal = state.get_legal_actions()
             if legal:
                 action = legal[0]
+
         return action
 
     def expectimax(self, state: GameState, depth_limit, current_depth):
@@ -26,6 +28,7 @@ class ExpectimaxAgent(Agent):
         if depth_limit is not None and current_depth >= depth_limit:
             return betterEvaluationFunction(state), None
 
+        # Maximizing player (X)
         if state.to_move == 'X':
             best_val = float('-inf')
             best_act = None
@@ -40,10 +43,10 @@ class ExpectimaxAgent(Agent):
 
             return best_val, best_act
 
+        # Chance node (opponent / O)
         else:
             actions = state.get_legal_actions()
             if not actions:
-
                 return betterEvaluationFunction(state), None
 
             total = 0.0
@@ -54,6 +57,4 @@ class ExpectimaxAgent(Agent):
 
             expected_value = total / len(actions)
             # No single "best action" at chance nodes (environment/opponent chooses randomly)
-            return expected_value, None
-            _, action = self.minimax(state)
-            return action
+            return expected_value, None
